@@ -693,6 +693,14 @@ func Cmdline(ctx context.Context, cfg Config) (exe string, args []string, err er
 		args = appendArgsIfNoConflict(args, "-initrd", initrd)
 	}
 
+	monitorSock := filepath.Join(cfg.InstanceDir, "qmonitor.sock")
+
+	// Add qemu monitor
+	args = append(args,
+		"-monitor", fmt.Sprintf("unix:%s,server,nowait", monitorSock))
+	args = append(args,
+		"-device", "virtio-balloon-pci,id=balloon0,deflate-on-oom=on")
+
 	// Network
 	// Configure default usernetwork with limayaml.MACAddress(driver.Instance.Dir) for eth0 interface
 	firstUsernetIndex := limayaml.FirstUsernetIndex(y)
